@@ -27,6 +27,8 @@ class ApiCloudController extends Controller
 
         $datas = $request->data;
 
+        return $datas;
+
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data['nouji'])->first();
             if($get) {
@@ -110,14 +112,9 @@ class ApiCloudController extends Controller
                 'kedalamanalurban'      => $data['alatuji_kedalamanalurban'],
                 'masaberlakuuji'        => $data['masaberlakuuji']
             ]);
-            // if($data->nouji)
         }
 
-        // return $generated_id;
-        return response()->json([
-            'success' => true,
-            'data' => $generated_id,
-        ]);
+        return $generated_id;
     }
 
     function change_jenis($data) {

@@ -140,11 +140,10 @@ class ApiController extends Controller
 
             $response = json_decode($api_response->getBody(), true);
 
-            return $response;
-            // return response()->json([
-            //     'success' => true,
-            //     'data' => $response,
-            // ]);
+            return response()->json([
+                'success' => true,
+                'data' => $response,
+            ]);
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
             return response()->json([
