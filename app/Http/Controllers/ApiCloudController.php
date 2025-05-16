@@ -113,7 +113,7 @@ class ApiCloudController extends Controller
             // if($data->nouji)
         }
 
-        return true;
+        return $generated_id;
     }
 
     function change_jenis($data) {
