@@ -26,7 +26,9 @@ class ApiCloudController extends Controller
         $decrypt = $this->helper->decryptToken($token);
 
         $datas = $request->data;
-        dd($datas);
+
+        return $datas;
+        // dd($datas);
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data->nouji)->first();
             if($get) {
