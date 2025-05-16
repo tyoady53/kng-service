@@ -144,6 +144,7 @@ class ApiController extends Controller
                 'data' => $response,
             ]);
         } catch (\Exception $e) {
+            return $e;
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to contact remote API',
