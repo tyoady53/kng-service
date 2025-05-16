@@ -6,6 +6,7 @@ use App\Helpers\EncryptionHelper;
 use App\Models\HasilUji;
 use App\Models\Kendaraan;
 use App\Models\KendaraanDetail;
+use DateTime;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -85,6 +86,7 @@ class ApiCloudController extends Controller
                 ]);
             }
 
+            $date = DateTime::createFromFormat('dmY', $data['masaberlakuuji']);
             HasilUji::create([
                 'id_kendaraan'          => $generated_id,
                 'fotodepan'             => $data['fotodepansmall'],
@@ -109,25 +111,11 @@ class ApiCloudController extends Controller
                 'penyimpanganlampukiri' => $data['alatuji_lampuutamapenyimpanganlampukiri'],
                 'penunjukkecepatan'     => $data['alatuji_penunjukkecepatan'],
                 'kedalamanalurban'      => $data['alatuji_kedalamanalurban'],
-                'masaberlakuuji'        => $data['masaberlakuuji']
+                'masaberlakuuji'        => $date->format('Y-m-d')
             ]);
         }
 
         return [$generated_id];
-    }
-
-    public function get_data(Request $request) {
-        $raw_query = `no_uji = '$request->search' OR no_kendaraan = '$request->search'`;
-
-        $data = Kendaraan::with('detail', 'hasil_terakhir')->where(function ($query) use ($request) {
-            $query->where('no_uji', $request->search)
-                  ->orWhere('no_kendaraan', $request->search);
-        })->first();
-
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
     }
 
     function change_jenis($data) {

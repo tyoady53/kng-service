@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::get('/get_data', [ApiController::class, 'get_data']);
 
 Route::prefix('public')->group(function () {
-
+    Route::get('/get_data', [ApiCloudController::class, 'get_data']);
 });
 
 Route::prefix('local')->group(function () {
@@ -35,5 +35,4 @@ Route::prefix('local')->group(function () {
 
 Route::prefix('cloud')->group(function () {
     Route::post('/post_data', [ApiCloudController::class, 'post_data']);
-    Route::get('/get_data', [ApiCloudController::class, 'get_data']);
 });

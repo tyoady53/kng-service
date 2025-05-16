@@ -14,18 +14,18 @@ return new class extends Migration
         Schema::create('hasil_ujis', function (Blueprint $table) {
             $table->id();
             $table->string('id_kendaraan',10);
-            $table->string('fotodepan');
-            $table->string('fotobelakang');
-            $table->string('fotokanan');
-            $table->string('fotokiri');
-            $table->string('emisiasap');
-            $table->string('emisico');
-            $table->string('emisihc');
+            $table->string('fotodepan')->nullable();
+            $table->string('fotobelakang')->nullable();
+            $table->string('fotokanan')->nullable();
+            $table->string('fotokiri')->nullable();
+            $table->string('emisiasap')->nullable();
+            $table->string('emisico')->nullable();
+            $table->string('emisihc')->nullable();
             $table->string('totalgayapengereman');
-            $table->string('selisihgayapengereman1');
-            $table->string('selisihgayapengereman2');
-            $table->string('selisihgayapengereman3');
-            $table->string('selisihgayapengereman4');
+            $table->string('selisihgayapengereman1')->nullable();
+            $table->string('selisihgayapengereman2')->nullable();
+            $table->string('selisihgayapengereman3')->nullable();
+            $table->string('selisihgayapengereman4')->nullable();
             $table->string('remparkirtangan');
             $table->string('remparkirkaki');
             $table->string('kincuprodadepan');
@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('penyimpanganlampukiri');
             $table->string('penunjukkecepatan');
             $table->string('kedalamanalurban');
-            $table->string('masaberlakuuji');
+            $table->date('masaberlakuuji');
             $table->timestamps();
         });
     }

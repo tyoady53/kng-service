@@ -37,9 +37,9 @@ return new class extends Migration
             $table->string('tinggibakatautangki');
             $table->string('julurdepan');
             $table->string('julurbelakang');
-            $table->string('jaraksumbu1_2');
-            $table->string('jaraksumbu2_3');
-            $table->string('jaraksumbu3_4');
+            $table->string('jaraksumbu1_2')->nullable();
+            $table->string('jaraksumbu2_3')->nullable();
+            $table->string('jaraksumbu3_4')->nullable();
             $table->string('dayaangkutorang');
             $table->string('dayaangkutbarang');
             $table->string('kelasjalanterendah');
