@@ -29,10 +29,12 @@ class ApiCloudController extends Controller
         $decrypt_status = $decrypt['success'];
         $datas = $request->data;
 
-        return [$decrypt_status];
-        // if($decrypt_return['success']) {
-        //     return [$decrypt_return['success']];
-        // }
+        // return [$decrypt_status];
+        if($decrypt_status) {
+            return $decrypt_status;
+        } else {
+            return false;
+        }
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data['nouji'])->first();
             if($get) {
