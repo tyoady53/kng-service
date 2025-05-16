@@ -26,6 +26,7 @@ class ApiCloudController extends Controller
         $decrypt = $this->helper->decryptToken($token);
 
         $datas = $request->data;
+        dd($datas);
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data->nouji)->first();
             if($get) {
@@ -115,8 +116,6 @@ class ApiCloudController extends Controller
         return response()->json([
             'success' => true,
         ]);
-        // $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
-        // dd($dataList);
     }
 
     function change_jenis($data) {
