@@ -29,7 +29,7 @@ class ApiCloudController extends Controller
 
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data['nouji'])->first();
-            if($get) {
+            if(count($get) > 0) {
                 $generated_id = $get->generated_id;
                 $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
                 if($detail && $detail->jenis != $data['jenis']) {
