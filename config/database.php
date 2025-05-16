@@ -80,9 +80,9 @@ return [
 
         'pgsql_eblue' => [
             'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
+            'url' => env('DATABASE_EBLUE_URL'),
+            'host' => env('DB_EBLUE_HOST', '127.0.0.1'),
+            'port' => env('DB_EBLUE_PORT', '5432'),
             'database' => $lines[2],
             'username' => $lines[3],
             'password' => $lines[4],
