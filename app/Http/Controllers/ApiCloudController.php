@@ -29,7 +29,6 @@ class ApiCloudController extends Controller
 
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data['nouji'])->first();
-            return $get;
             if($get) {
                 $generated_id = $get->generated_id;
                 $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
@@ -37,6 +36,7 @@ class ApiCloudController extends Controller
                     $this->change_jenis($data);
                 }
             } else {
+                return $data;
                 $milliseconds = round(microtime(true) * 1000);
                 $generated_id = md5($data->id.$milliseconds);
 
