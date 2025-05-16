@@ -37,7 +37,7 @@ class ApiCloudController extends Controller
                 }
             } else {
                 $milliseconds = round(microtime(true) * 1000);
-                $generated_id = md5($data->id.$milliseconds);
+                $generated_id = md5($data['id'].$milliseconds);
 
                 Kendaraan::create([
                     'generated_id'      => $generated_id,
