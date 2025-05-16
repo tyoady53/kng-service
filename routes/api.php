@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiCloudController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ApiPublicController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,7 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Route::get('/get_data', [ApiController::class, 'get_data']);
 
 Route::prefix('public')->group(function () {
-    Route::get('/get_data', [ApiCloudController::class, 'get_data']);
+    Route::get('/get_data', [ApiPublicController::class, 'get_data']);
 });
 
 Route::prefix('local')->group(function () {
