@@ -38,25 +38,28 @@ class EncryptionHelper
 
     public static function encrypt($data)
     {
-        $secretKey = hash('sha256', env('SECRET_KEY')); // Buat key lebih aman
-        $iv = random_bytes(16); // IV harus unik setiap kali
+        $secret_key = env('SECRET_KEY');
+        $milliseconds = round(microtime(true) * 1000);
+        $encrypt = md5($data.$secret_key.$milliseconds);
+        $token = $encrypt.'@'.$milliseconds;
 
-        // Enkripsi menggunakan AES-256-CBC
-        $encrypted = openssl_encrypt($data, 'aes-256-cbc', $secretKey, 0, $iv);
-
-        return base64_encode($iv . $encrypted); // Gabungkan IV + Enkripsi
+        return $token;
     }
 
     public static function decryptToken($token)
     {
         try {
-            $secretKey = hash('sha256', env('SECRET_KEY'), true);
-            $decoded = base64_decode($token);
+            // return explode("@", $token)[1];
+            $encrypt = explode("@", $token)[0];
+            $milliseconds = explode("@", $token)[1];
+            // $secretKey = hash('sha256', env('SECRET_KEY'), true);
+            // $decoded = base64_decode($token);
 
-            $iv = substr($decoded, 0, 16);
-            $encryptedData = substr($decoded, 16);
+            // $iv = substr($decoded, 0, 16);
+            // $encryptedData = substr($decoded, 16);
 
-            $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, OPENSSL_RAW_DATA, $iv);
+            // $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, OPENSSL_RAW_DATA, $iv);
+            $decrypted = ($token == $encrypt.'@'.$milliseconds);
 
             return [
                 'success' => $decrypted !== false,
@@ -67,7 +70,7 @@ class EncryptionHelper
             return [
                 'success' => false,
                 'message' => 'Exception: ' . $e->getMessage(),
-                'data'    => null,
+                'data'    => null
             ];
         }
     }

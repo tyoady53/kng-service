@@ -114,6 +114,7 @@ class ApiController extends Controller
     //     }
     // }
     public function decrypt(Request $request) {
+        // dd($request->token);
         return $this->helper->decryptToken($request->token);
     }
 
