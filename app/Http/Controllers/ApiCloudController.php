@@ -38,7 +38,7 @@ class ApiCloudController extends Controller
             } else {
                 $milliseconds = round(microtime(true) * 1000);
                 $generated_id = md5($data['id'].$milliseconds);
-                return [$generated_id];
+                // return [$generated_id];
 
                 Kendaraan::create([
                     'generated_id'      => $generated_id,
@@ -113,7 +113,7 @@ class ApiCloudController extends Controller
             ]);
         }
 
-        return $generated_id;
+        return [$generated_id];
     }
 
     function change_jenis($data) {
