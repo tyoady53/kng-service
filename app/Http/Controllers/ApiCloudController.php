@@ -26,6 +26,7 @@ class ApiCloudController extends Controller
         $token = $request->token;
         $decrypt = $this->helper->decryptToken($token);
 
+        return $decrypt;
         $datas = $request->data;
 
         foreach($datas as $data) {
@@ -39,7 +40,6 @@ class ApiCloudController extends Controller
             } else {
                 $milliseconds = round(microtime(true) * 1000);
                 $generated_id = md5($data['id'].$milliseconds);
-                // return [$generated_id];
 
                 Kendaraan::create([
                     'generated_id'      => $generated_id,
