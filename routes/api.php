@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/get_data', [ApiController::class, 'get_data']);
+// Route::get('/get_data', [ApiController::class, 'get_data']);
 
 Route::prefix('public')->group(function () {
 
@@ -29,8 +29,10 @@ Route::prefix('public')->group(function () {
 Route::prefix('local')->group(function () {
     Route::get('/info', ApiController::class);
     Route::get('/decrypt', [ApiController::class, 'decrypt']);
+    // Route::get('/get_data', [ApiController::class, 'get_data']);
+    Route::get('/send', [ApiController::class, 'send']);
 });
 
 Route::prefix('cloud')->group(function () {
-    Route::post('/post_data', [ApiCloudController::class, 'post_data']);
+    Route::get('/post_data', [ApiCloudController::class, 'post_data']);
 });
