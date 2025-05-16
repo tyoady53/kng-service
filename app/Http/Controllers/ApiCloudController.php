@@ -26,7 +26,7 @@ class ApiCloudController extends Controller
         $token = $request->token;
         $decrypt = $this->helper->decryptToken($token);
 
-        return $decrypt;
+        return $decrypt->data;
         $datas = $request->data;
 
         foreach($datas as $data) {
