@@ -143,12 +143,13 @@ class ApiController extends Controller
                 'success' => true,
                 'data' => $response,
             ]);
-        } catch (\Exception $e) {
-            return $e;
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to contact remote API',
                 'error' => $e->getMessage(),
+                'response' => $body, // Show full error body
             ]);
         }
     }
