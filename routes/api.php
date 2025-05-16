@@ -34,5 +34,5 @@ Route::prefix('local')->group(function () {
 });
 
 Route::prefix('cloud')->group(function () {
-    Route::get('/post_data', [ApiCloudController::class, 'post_data']);
+    Route::post('/post_data', [ApiCloudController::class, 'post_data']);
 });

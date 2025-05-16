@@ -49,16 +49,9 @@ class EncryptionHelper
     public static function decryptToken($token)
     {
         try {
-            // return explode("@", $token)[1];
             $encrypt = explode("@", $token)[0];
             $milliseconds = explode("@", $token)[1];
-            // $secretKey = hash('sha256', env('SECRET_KEY'), true);
-            // $decoded = base64_decode($token);
 
-            // $iv = substr($decoded, 0, 16);
-            // $encryptedData = substr($decoded, 16);
-
-            // $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, OPENSSL_RAW_DATA, $iv);
             $decrypted = ($token == $encrypt.'@'.$milliseconds);
 
             return [
