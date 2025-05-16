@@ -14,16 +14,16 @@ class Kendaraan extends Model
 
     public function detail()
     {
-        return $this->hasOne(KendaraanDetail::class, 'generated_id', 'kendaraan_id')->latest();
+        return $this->hasOne(KendaraanDetail::class, 'kendaraan_id', 'generated_id')->latest();
     }
 
     public function hasil_uji()
     {
-        return $this->hasMany(HasilUji::class, 'generated_id', 'kendaraan_id');
+        return $this->hasMany(HasilUji::class, 'kendaraan_id', 'generated_id');
     }
 
     public function hasil_terakhir()
     {
-        return $this->hasOne(HasilUji::class, 'generated_id', 'kendaraan_id')->latest();
+        return $this->hasOne(HasilUji::class, 'kendaraan_id', 'generated_id')->latest();
     }
 }
