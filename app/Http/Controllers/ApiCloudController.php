@@ -116,6 +116,17 @@ class ApiCloudController extends Controller
         return [$generated_id];
     }
 
+    public function get_data(Request $request) {
+        $raw_query = `no_uji = '$request->search' OR no_kendaraan = '$request->search'`;
+
+        $data = Kendaraan::with('detail', 'hasil_terakhir')->whereRaw($raw_query)->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
     function change_jenis($data) {
 
     }
