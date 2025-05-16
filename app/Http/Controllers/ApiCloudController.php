@@ -22,7 +22,7 @@ class ApiCloudController extends Controller
         $token = $request->token;
         $decrypt = $this->helper->decryptToken($token);
 
-        return $decrypt;
+        return $request;
         $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
         dd($dataList);
     }

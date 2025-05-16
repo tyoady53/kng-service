@@ -132,10 +132,6 @@ class ApiController extends Controller
 
         try {
             $api_response = $client->post($base_url, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ],
                 'json' => [
                     'data' => $dataList,  // send your dataList as 'data'
                 ],
