@@ -124,8 +124,9 @@ class ApiController extends Controller
         $hdd_id = $this->helper->getHDD_id();
         $token = $this->helper->encrypt(trim($hdd_id));
 
-        $base_url = $$this->lines[0] . '/api/cloud/post_data?token=' . $token;
+        $base_url = $this->lines[0] . '/api/cloud/post_data?token=' . $token;
 
+        dd($base_url);
         // Fetch data from DB
         $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
 

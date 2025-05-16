@@ -50,25 +50,23 @@ class EncryptionHelper
     public static function decryptToken($token)
     {
         try {
-            $secretKey = hash('sha256', env('SECRET_KEY'));
+            $secretKey = hash('sha256', env('SECRET_KEY'), true);
             $decoded = base64_decode($token);
 
             $iv = substr($decoded, 0, 16);
             $encryptedData = substr($decoded, 16);
 
-            $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, 0, $iv);
+            $decrypted = openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, OPENSSL_RAW_DATA, $iv);
 
             return [
-                'success' => true,
-                'message' => 'Decrypt Success',
+                'success' => $decrypted !== false,
+                'message' => $decrypted !== false ? 'Decrypt Success' : 'Decrypt Failed',
                 'data'    => $decrypted,
             ];
         } catch (\Exception $e) {
-            Log::error("Decrypt Error: " . $e->getMessage());
-
             return [
                 'success' => false,
-                'message' => 'Decrypt failed',
+                'message' => 'Exception: ' . $e->getMessage(),
                 'data'    => null,
             ];
         }
