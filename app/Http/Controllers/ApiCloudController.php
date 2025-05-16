@@ -86,7 +86,8 @@ class ApiCloudController extends Controller
                 ]);
             }
 
-            $date = DateTime::createFromFormat('dmY', $data['masaberlakuuji']);
+            $masaberlakuuji = DateTime::createFromFormat('dmY', $data['masaberlakuuji']);
+            $tgl_uji = DateTime::createFromFormat('dmY', $data['tgluji']);
             HasilUji::create([
                 'id_kendaraan'          => $generated_id,
                 'fotodepan'             => $data['fotodepansmall'],
@@ -111,7 +112,8 @@ class ApiCloudController extends Controller
                 'penyimpanganlampukiri' => $data['alatuji_lampuutamapenyimpanganlampukiri'],
                 'penunjukkecepatan'     => $data['alatuji_penunjukkecepatan'],
                 'kedalamanalurban'      => $data['alatuji_kedalamanalurban'],
-                'masaberlakuuji'        => $date->format('Y-m-d')
+                'masaberlakuuji'        => $masaberlakuuji->format('Y-m-d'),
+                'tgl_uji'               => $tgl_uji->format('Y-m-d'),
             ]);
         }
 

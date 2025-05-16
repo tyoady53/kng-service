@@ -37,6 +37,7 @@ return new class extends Migration
             $table->string('penunjukkecepatan');
             $table->string('kedalamanalurban');
             $table->date('masaberlakuuji');
+            $table->date('tgl_uji');
             $table->timestamps();
         });
     }
