@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('kendaraans', function (Blueprint $table) {
             $table->id();
-            $table->string('generated_id',10);
-            $table->string('no_kendaraan',10);
+            $table->string('generated_id',50);
+            $table->string('no_kendaraan',15);
             $table->string('no_uji');
             $table->string('nama');
             $table->string('nosertifikatreg');
