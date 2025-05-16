@@ -27,7 +27,7 @@ class ApiCloudController extends Controller
 
         $datas = $request->data;
 
-        return $datas[0]->nouji;
+        return $datas[0];
         // dd($datas);
         $get = Kendaraan::where('no_uji', $datas[0]->nouji)->first();
         return $get;
