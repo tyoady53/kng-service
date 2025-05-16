@@ -26,10 +26,10 @@ class ApiCloudController extends Controller
         $token = $request->token;
         $decrypt = $this->helper->decryptToken($token);
 
-        $decrypt_return = $decrypt['data'];
+        $decrypt_return = $decrypt['data']['success'];
         $datas = $request->data;
 
-        return $decrypt_return['success'];
+        return [$decrypt_return];
         // if($decrypt_return['success']) {
         //     return [$decrypt_return['success']];
         // }
