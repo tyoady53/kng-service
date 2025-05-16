@@ -27,7 +27,7 @@ class ApiCloudController extends Controller
 
         $datas = $request->data;
 
-        return $datas;
+        // return $datas;
         // dd($datas);
         foreach($datas as $data) {
             $get = Kendaraan::where('no_uji', $data->nouji)->first();
@@ -115,9 +115,7 @@ class ApiCloudController extends Controller
             // if($data->nouji)
         }
 
-        return response()->json([
-            'success' => true,
-        ]);
+        return true;
     }
 
     function change_jenis($data) {
