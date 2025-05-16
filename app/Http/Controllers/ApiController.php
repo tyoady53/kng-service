@@ -130,6 +130,7 @@ class ApiController extends Controller
         // Fetch data from DB
         $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
 
+
         try {
             $api_response = $client->post($base_url, [
                 'json' => [
@@ -139,10 +140,11 @@ class ApiController extends Controller
 
             $response = json_decode($api_response->getBody(), true);
 
-            return response()->json([
-                'success' => true,
-                'data' => $response,
-            ]);
+            return $response;
+            // return response()->json([
+            //     'success' => true,
+            //     'data' => $response,
+            // ]);
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
             return response()->json([
