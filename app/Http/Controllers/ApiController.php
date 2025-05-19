@@ -123,7 +123,7 @@ class ApiController extends Controller
         $last = $data[0]->id;
 
         $upload = $this->upload();
-        dd($upload);
+        dd($upload['success']);
     }
 
     function upload() {
@@ -135,7 +135,7 @@ class ApiController extends Controller
 
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
         // Fetch data from DB
-        $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
+        $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian ORDER BY id ASC');
 
         try {
             $api_response = $client->post($base_url, [
