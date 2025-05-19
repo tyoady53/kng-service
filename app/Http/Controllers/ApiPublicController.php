@@ -13,6 +13,10 @@ class ApiPublicController extends Controller
                   ->orWhere('no_kendaraan', $request->search);
         })->first();
 
+        if ($data) {
+            $data->makeHidden('id'); // Hide the 'id' attribute from the JSON
+        }
+
         return response()->json([
             'success' => true,
             'data' => $data,

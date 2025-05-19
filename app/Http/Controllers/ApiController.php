@@ -27,109 +27,66 @@ class ApiController extends Controller
         return $this->helper->info();
     }
 
-    // public function get_data() {
-    //     $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
-    //     dd($dataList);
-    // }
-
-    // public function post_data() {
-    //     $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
-
-    //     foreach ($dataList as $data) {
-    //         $maxRetries = 5;
-    //         $attempt = 0;
-
-    //         do {
-    //             $attempt++;
-    //             $response = Http::post("{$this->lines[0]}/api/post/{$this->encrypt($this->lines[1])}", $data);
-
-    //             if ($response->successful()) {
-    //                 break;
-    //             }
-
-    //             // Optional: wait before retrying
-    //             sleep(2);
-
-    //         } while ($attempt < $maxRetries);
-
-    //         // If still not successful after retries
-    //         if (!$response->successful()) {
-    //             Log::error("Failed to send data after $attempt attempts", [
-    //                 'data' => $data,
-    //                 'response' => $response->body(),
-    //             ]);
-    //         }
-    //     }
-
-    //     return response()->json(['message' => 'All data processed.']);
-    // }
-
-    // function getHDD_id() {
-    //     $os_name = php_uname('s');
-    //     if($os_name == 'Linux') {
-    //         $serial = shell_exec("lsblk -d -o SERIAL | sed -n '2p'");
-    //     } else {
-    //         $serial = shell_exec("wmic diskdrive get SerialNumber | findstr /V SerialNumber");
-    //     }
-
-    //     return str_replace(".", "", $serial);
-    // }
-
-    // public static function encrypt($data)
-    // {
-    //     $secretKey = hash('sha256', env('SECRET_KEY')); // Buat key lebih aman
-    //     $iv = random_bytes(16); // IV harus unik setiap kali
-
-    //     // Enkripsi menggunakan AES-256-CBC
-    //     $encrypted = openssl_encrypt($data, 'aes-256-cbc', $secretKey, 0, $iv);
-
-    //     return base64_encode($iv . $encrypted); // Gabungkan IV + Enkripsi
-    // }
-
-    // // Dekripsi Data
-    // public static function decrypt(Request $request)
-    // {
-    //     $token = $request->token;
-    //     try {
-    //         $secretKey = hash('sha256', env('SECRET_KEY'));
-    //         $decoded = base64_decode($token);
-
-    //         $iv = substr($decoded, 0, 16); // Ambil IV dari hasil enkripsi
-    //         $encryptedData = substr($decoded, 16); // Ambil sisa data terenkripsi
-
-    //         // return openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, 0, $iv);
-    //         return response()->json([
-    //             'success'   => true,
-    //             'message'   => 'Decrypt Success',
-    //             'data'      => openssl_decrypt($encryptedData, 'aes-256-cbc', $secretKey, 0, $iv),
-    //         ]);
-    //     } catch (Exception $e) {
-    //         Log::error("Decrypt Error: " . $e->getMessage());
-    //         // return null;
-    //         return response()->json([
-    //             'success'   => false,
-    //             'message'   => 'Decrypt failed',
-    //             'data'      => null,
-    //         ]);
-    //     }
-    // }
     public function decrypt(Request $request) {
-        // dd($request->token);
         return $this->helper->decryptToken($request->token);
     }
 
-    public function send() {
-        $data = DB::connection('pgsql_eblue')->select('select * from datapengujian order by id DESC limit 1');
-        $last = $data[0]->id;
+    // public function send() {
+    //     $data = DB::connection('pgsql_eblue')->select('select * from datapengujian order by id DESC limit 1');
+    //     $last = $data[0]->id;
 
-        $upload = $this->upload();
-        $response = $upload->getOriginalContent();
-        if($response) {
-            $this->upload();
+    //     $last_upload = $this->get_last_uploaded();
+    //     if($last > $last_upload['data']) {
+
+    //     }
+    //     dd($last_upload['data']);
+    //     $upload = $this->upload($last_upload['data']);
+    //     $response = $upload->getOriginalContent();
+    //     if($response) {
+    //         $this->upload();
+    //     }
+    // }
+
+    public function send()
+    {
+        $last_upload = $this->get_last_uploaded();
+        $last_uploaded_id = $last_upload['data'] ?? 0;
+        $message = 'No data to upload';
+
+        while (true) {
+            // Get the next batch of up to 10 rows
+            $newData = DB::connection('pgsql_eblue')
+                ->select('SELECT * FROM datapengujian WHERE id > ? ORDER BY id ASC LIMIT 10', [$last_uploaded_id]);
+
+            // If no more new data, exit loop
+            if (empty($newData)) {
+                break;
+            }
+
+            // Upload current batch
+            $uploadResponse = $this->upload($newData);
+            $responseData = $uploadResponse->getOriginalContent();
+
+            if (!($responseData['success'] ?? false)) {
+                // Stop if upload fails
+                // dd(, $responseData);
+                $this->create_log("Upload failed [".$responseData."]");
+            }
+
+            // Update last uploaded ID based on latest data sent
+            $last_uploaded_id = end($newData)->id;
+            $message = 'All new data uploaded successfully';
+            $this->create_log($message);
         }
+
+        $this->create_log($message);
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+        ]);
     }
 
-    function get_las_uploaded() {
+    function get_last_uploaded() {
         $client = new Client();
 
         $hdd_id = $this->helper->getHDD_id();
@@ -137,9 +94,14 @@ class ApiController extends Controller
         $cloud = $this->lines[5];
 
         $base_url = $cloud . '/api/cloud/get_last?token=' . $token;
+
+        $api_response = $client->get($base_url);
+        $response = json_decode($api_response->getBody(), true);
+
+        return $response;
     }
 
-    function upload() {
+    function upload($dataList) {
         $client = new Client();
 
         $hdd_id = $this->helper->getHDD_id();
@@ -147,13 +109,11 @@ class ApiController extends Controller
         $cloud = $this->lines[5];
 
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
-        // Fetch data from DB
-        $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian ORDER BY id ASC');
 
         try {
             $api_response = $client->post($base_url, [
                 'json' => [
-                    'data' => $dataList,  // send your dataList as 'data'
+                    'data' => $dataList,
                 ],
             ]);
 
@@ -169,8 +129,24 @@ class ApiController extends Controller
                 'success' => false,
                 'message' => 'Failed to contact remote API',
                 'error' => $e->getMessage(),
-                'response' => $body, // Show full error body
+                'response' => $body,
             ]);
         }
+    }
+
+    function create_log($last_uploaded_id) {
+        $dir = './storage/app-log/upload';
+        if ( !is_dir($dir) ) {
+            mkdir($dir, 0777, true);
+        }
+        if(!file_exists($dir.'/Log Upload.log')){
+            fopen($dir.'/Log Upload.log', 'w');
+        }
+        //Something to write to txt log
+        $log  = date("Y-m-d H:i:s").PHP_EOL.
+        "Attempt: ".$last_uploaded_id.PHP_EOL.
+        "---------------------------------------------------------------------".PHP_EOL;
+        //Save string to log, use FILE_APPEND to append.
+        file_put_contents($dir.'/Log Upload.log', $log, FILE_APPEND);
     }
 }
