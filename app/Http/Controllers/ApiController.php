@@ -123,7 +123,20 @@ class ApiController extends Controller
         $last = $data[0]->id;
 
         $upload = $this->upload();
-        dd($upload['success']);
+        $response = $upload->getOriginalContent();
+        if($response) {
+            $this->upload();
+        }
+    }
+
+    function get_las_uploaded() {
+        $client = new Client();
+
+        $hdd_id = $this->helper->getHDD_id();
+        $token = $this->helper->encrypt(trim($hdd_id));
+        $cloud = $this->lines[5];
+
+        $base_url = $cloud . '/api/cloud/get_last?token=' . $token;
     }
 
     function upload() {

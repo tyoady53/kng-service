@@ -20,6 +20,20 @@ class ApiCloudController extends Controller
         $this->lines = file(base_path('api.txt'), FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     }
 
+    public function get_last(Request $request) {
+        $token = $request->token;
+        $decrypt = $this->helper->decryptToken($token);
+        $decrypt_status = $decrypt['success'];
+
+        if($decrypt_status) {
+            $data = Upload::first();
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+            ]);
+        }
+    }
+
     public function post_data(Request $request) {
         $target = $this->lines[1];
         $token = $request->token;
