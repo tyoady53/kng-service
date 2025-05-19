@@ -24,12 +24,16 @@ class ApiCloudController extends Controller
         $token = $request->token;
         $decrypt = $this->helper->decryptToken($token);
         $decrypt_status = $decrypt['success'];
+        $last_upload = 0;
 
         if($decrypt_status) {
             $data = Upload::first();
+            if($data) {
+                $last_upload = $data->last_sync;
+            }
             return response()->json([
                 'success' => true,
-                'data' => $data,
+                'data' => $last_upload,
             ]);
         }
     }
