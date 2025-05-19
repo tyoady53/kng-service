@@ -11,4 +11,5 @@ class KendaraanDetail extends Model
     protected $guarded = [
         'id',
     ];
+    protected $hidden = ['id'];
 }
