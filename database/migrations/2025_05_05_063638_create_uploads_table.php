@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('uploads', function (Blueprint $table) {
             $table->id();
             $table->integer('last_sync');
+            $table->longText('uploaded_id');
             $table->timestamps();
         });
     }

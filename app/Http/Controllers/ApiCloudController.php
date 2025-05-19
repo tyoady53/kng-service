@@ -6,10 +6,9 @@ use App\Helpers\EncryptionHelper;
 use App\Models\HasilUji;
 use App\Models\Kendaraan;
 use App\Models\KendaraanDetail;
+use App\Models\Upload;
 use DateTime;
-use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ApiCloudController extends Controller
 {
@@ -29,8 +28,11 @@ class ApiCloudController extends Controller
         $decrypt_status = $decrypt['success'];
         $datas = $request->data;
 
-        // return [$decrypt_status];
+        $uploaded = '';
+        $uploded_success = null;
+
         if($decrypt_status) {
+            $last_update = Upload::lastest()->first();
             foreach($datas as $data) {
                 $get = Kendaraan::where('no_uji', $data['nouji'])->first();
                 if($get) {
@@ -38,10 +40,9 @@ class ApiCloudController extends Controller
                     $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
                     if($detail && $detail->jenis != $data['jenis']) {
                         $ret = $this->change_jenis($data,$generated_id);
-
-                        if($ret) {
-                            return $ret;
-                        }
+                        // if($ret) {
+                        //     return $data->id;
+                        // }
                     }
                 } else {
                     $milliseconds = round(microtime(true) * 1000);
@@ -121,15 +122,35 @@ class ApiCloudController extends Controller
                     'masaberlakuuji'        => $masaberlakuuji->format('Y-m-d'),
                     'tgl_uji'               => $tgl_uji->format('Y-m-d'),
                 ]);
+
+                $uploded_success .= $data['id'].',';
+                $uploaded = $data['id'];
             }
 
-            return true;
+            if($last_update) {
+                $uplod_done = $last_update->uploaded_id;
+                $update_uploaded_id = $uplod_done.$uploded_success;
+
+                $last_update->update([
+                    'last_sync'     => $uploaded,
+                    'uploaded_id'   => $update_uploaded_id,
+                ]);
+            } else {
+                Upload::create([
+                    'last_sync'     => $uploaded,
+                    'uploaded_id'   => $uploded_success,
+                ]);
+            }
+
+            return $uploaded;
         } else {
             return false;
         }
     }
 
     function change_jenis($data,$generated_id) {
+        $uploded_success = null;
+
         $insert = KendaraanDetail::create([
             'id_kendaraan'      => $generated_id,
             'merek'             => $data['merek'],
@@ -192,6 +213,25 @@ class ApiCloudController extends Controller
             'masaberlakuuji'        => $masaberlakuuji->format('Y-m-d'),
             'tgl_uji'               => $tgl_uji->format('Y-m-d'),
         ]);
+        $last_update = Upload::lastest()->first();
+
+        $uploded_success .= $data['id'].',';
+        $uploaded = $data['id'];
+
+        if($last_update) {
+            $uplod_done = $last_update->uploaded_id;
+            $update_uploaded_id = $uplod_done.$uploded_success;
+
+            $last_update->update([
+                'last_sync'     => $uploaded,
+                'uploaded_id'   => $update_uploaded_id,
+            ]);
+        } else {
+            Upload::create([
+                'last_sync'     => $uploaded,
+                'uploaded_id'   => $uploded_success,
+            ]);
+        }
 
         if($insert) {
             return true;

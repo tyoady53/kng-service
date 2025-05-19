@@ -118,8 +118,15 @@ class ApiController extends Controller
         return $this->helper->decryptToken($request->token);
     }
 
-    public function send()
-    {
+    public function send() {
+        $data = DB::connection('pgsql_eblue')->select('select * from datapengujian order by id DESC limit 1');
+        $last = $data[0]->id;
+
+        $upload = $this->upload();
+        dd($upload);
+    }
+
+    function upload() {
         $client = new Client();
 
         $hdd_id = $this->helper->getHDD_id();
@@ -129,7 +136,6 @@ class ApiController extends Controller
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
         // Fetch data from DB
         $dataList = DB::connection('pgsql_eblue')->select('select * from datapengujian');
-
 
         try {
             $api_response = $client->post($base_url, [
