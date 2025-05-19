@@ -32,7 +32,7 @@ class ApiCloudController extends Controller
         $uploded_success = null;
 
         if($decrypt_status) {
-            $last_update = Upload::lastest()->first();
+            $last_update = Upload::first();
             foreach($datas as $data) {
                 $get = Kendaraan::where('no_uji', $data['nouji'])->first();
                 if($get) {
