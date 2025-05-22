@@ -55,8 +55,6 @@ class ApiPublicController extends Controller
                   ->orWhere('no_kendaraan', $request->search);
         })->first();
 
-        dd($data);
-
         return response()->json([
             'success' => true,
             'data' => $data,
