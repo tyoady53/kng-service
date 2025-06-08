@@ -39,7 +39,7 @@ class EncryptionHelper
             $serial = shell_exec("wmic diskdrive get SerialNumber | findstr /V SerialNumber");
         }
 
-        dd($osname);
+        dd($os_name);
 
         return str_replace(".", "", $serial);
     }
