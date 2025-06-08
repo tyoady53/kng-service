@@ -34,16 +34,16 @@ class EncryptionHelper
     function getHDD_id() {
         $os_name = php_uname('s');
         if($os_name == 'Linux') {
-            $command = "sudo /usr/sbin/smartctl -i /dev/sda | grep 'Serial Number'";
-            $output = shell_exec($command);
+            // $command = "sudo /usr/sbin/smartctl -i /dev/sda | grep 'Serial Number'";
+            // $output = shell_exec($command);
 
-            if (preg_match('/Serial Number:\s+(.*)/', $output, $matches)) {
-                $serial = trim($matches[1]);
-                dd(trim($matches[1]));
-            } else {
-                $serial = "PKBKUNINGAN2025";
-            }
-            // $serial = shell_exec("lsblk -d -o SERIAL | sed -n '2p'");
+            // if (preg_match('/Serial Number:\s+(.*)/', $output, $matches)) {
+            //     $serial = trim($matches[1]);
+            //     dd(trim($matches[1]));
+            // } else {
+            //     $serial = "PKBKUNINGAN2025";
+            // }
+            $serial = shell_exec("udevadm info --query=all --name=/dev/sda | grep ID_SERIAL= | cut -d= -f2");
         } else {
             $serial = shell_exec("wmic diskdrive get SerialNumber | findstr /V SerialNumber");
         }
