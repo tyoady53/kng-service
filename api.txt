@@ -1,0 +1,7 @@
+https://pkbkng.cygnus.id
+ST1000DM010-2EP102_ZN1GZ3NK
+e-blue
+postgres
+pkbkuningan
+192.168.100.104:8000
+192.168.100.100/pkbkuningan/assets/images/kendaraan/
