@@ -31,22 +31,6 @@ class ApiController extends Controller
         return $this->helper->decryptToken($request->token);
     }
 
-    // public function send() {
-    //     $data = DB::connection('pgsql_eblue')->select('select * from datapengujian order by id DESC limit 1');
-    //     $last = $data[0]->id;
-
-    //     $last_upload = $this->get_last_uploaded();
-    //     if($last > $last_upload['data']) {
-
-    //     }
-    //     dd($last_upload['data']);
-    //     $upload = $this->upload($last_upload['data']);
-    //     $response = $upload->getOriginalContent();
-    //     if($response) {
-    //         $this->upload();
-    //     }
-    // }
-
     public function send()
     {
         $last_upload = $this->get_last_uploaded();
@@ -58,7 +42,6 @@ class ApiController extends Controller
             $newData = DB::connection('pgsql_eblue')
                 ->select('SELECT * FROM datapengujian WHERE id > ? ORDER BY id ASC LIMIT 10', [$last_uploaded_id]);
 
-            // If no more new data, exit loop
             if (empty($newData)) {
                 break;
             }
@@ -68,8 +51,6 @@ class ApiController extends Controller
             $responseData = $uploadResponse->getOriginalContent();
 
             if (!($responseData['success'] ?? false)) {
-                // Stop if upload fails
-                // dd(, $responseData);
                 $this->create_log("Upload failed [".$responseData."]");
             }
 
@@ -104,11 +85,52 @@ class ApiController extends Controller
     function upload($dataList) {
         $client = new Client();
 
+        $filePaths = null;
+
         $hdd_id = $this->helper->getHDD_id();
         $token = $this->helper->encrypt(trim($hdd_id));
         $cloud = $this->lines[5];
+        $table = 'kendaraan';
 
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
+
+        foreach($dataList as $list) {
+            $imgF = 'noImage.png';
+            $imgB = 'noImage.png';
+            $imgL = 'noImage.png';
+            $imgR = 'noImage.png';
+            $base = 'C:\laragon\www\pkbkuningan\assets\images\kendaraan/';
+            if($list->kodewilayah != $list->kodewilayahasal) {
+                $table = 'kendaraannp';
+            }
+            $pkbKngLocal = DB::connection('mysql_local')
+            ->select("SELECT * FROM $table WHERE NoUji = '".$list->nouji."'");
+
+            foreach($pkbKngLocal as $local) {
+                if($local) {
+                    if (!empty($local->imgF) && file_exists($base . $local->imgF)) {
+                        $imgF = $local->imgF;
+                    }
+                    if (!empty($local->imgB) && file_exists($base . $local->imgB)) {
+                        $imgB = $local->imgB;
+                    }
+                    if (!empty($local->imgL) && file_exists($base . $local->imgL)) {
+                        $imgL = $local->imgL;
+                    }
+                    if (!empty($local->imgR) && file_exists($base . $local->imgR)) {
+                        $imgR = $local->imgR;
+                    }
+                }
+            }
+            $filePaths[$list->nouji] = [
+                $base.$imgF,
+                $base.$imgB,
+                $base.$imgL,
+                $base.$imgR,
+            ];
+        }
+
+        // dd($dataList,$filePaths);
 
         try {
             $api_response = $client->post($base_url, [

@@ -16,12 +16,18 @@ class EncryptionHelper
     public function info() {
         $hdd_id = $this->getHDD_id();
 
+        $lines_arr = array();
+        foreach ($this->lines as $line) {
+            array_push($lines_arr, $line);
+        }
+
         return response()->json([
             'success'   => true,
             'message'   => 'init Info',
             'path'      => "{$this->lines[0]}",
             'hdd_id'    => trim($hdd_id),
-            'encrypted' => $this->encrypt(trim($hdd_id))
+            'encrypted' => $this->encrypt(trim($hdd_id)),
+            'lines'     => $lines_arr,
         ]);
     }
 
@@ -32,6 +38,8 @@ class EncryptionHelper
         } else {
             $serial = shell_exec("wmic diskdrive get SerialNumber | findstr /V SerialNumber");
         }
+
+        dd($osname);
 
         return str_replace(".", "", $serial);
     }

@@ -58,9 +58,6 @@ class ApiCloudController extends Controller
                     $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
                     if($detail && $detail->jenis != $data['jenis']) {
                         $ret = $this->change_jenis($data,$generated_id);
-                        // if($ret) {
-                        //     return $data->id;
-                        // }
                     }
                 } else {
                     $milliseconds = round(microtime(true) * 1000);
