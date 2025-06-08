@@ -39,6 +39,7 @@ class EncryptionHelper
 
             if (preg_match('/Serial Number:\s+(.*)/', $output, $matches)) {
                 $serial = trim($matches[1]);
+                dd(trim($matches[1]));
             } else {
                 $serial = "PKBKUNINGAN2025";
             }
