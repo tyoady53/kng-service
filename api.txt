@@ -1,7 +1,7 @@
-127.0.0.1:1234
-0025_38B4_21B1_F66B
+192.168.100.104:8000
+ST1000DM010-2EP102_ZN1GZ3NK
 e-blue
 postgres
-Victus15
-192.168.4.156:8000
-127.0.0.1/pkbkuningan/assets/images/kendaraan/
+pkbkuningan
+192.168.100.104:8000
+192.168.100.100/pkbkuningan/assets/images/kendaraan/
