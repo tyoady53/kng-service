@@ -1,7 +1,0 @@
-127.0.0.1:1234
-0025_38B4_21B1_F66B
-e-blue
-postgres
-Victus15
-192.168.4.156:8000
-127.0.0.1/pkbkuningan/assets/images/kendaraan/
