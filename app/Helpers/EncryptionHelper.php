@@ -40,7 +40,7 @@ class EncryptionHelper
             if (preg_match('/Serial Number:\s+(.*)/', $output, $matches)) {
                 $serial = trim($matches[1]);
             } else {
-                echo "Serial not found";
+                $serial = "PKBKUNINGAN2025";
             }
             // $serial = shell_exec("lsblk -d -o SERIAL | sed -n '2p'");
         } else {
