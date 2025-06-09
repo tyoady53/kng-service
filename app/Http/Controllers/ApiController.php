@@ -107,7 +107,6 @@ class ApiController extends Controller
             ->select("SELECT * FROM $table WHERE NoUji = '".$list->nouji."'");
 
             foreach($pkbKngLocal as $local) {
-                // dd($local->imgF);
                 if($local) {
                     if ($local->imgF) {
                         $imgF = $local->imgF;
