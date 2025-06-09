@@ -1,4 +1,4 @@
-https://pkbkng.cygnus.id
+192.168.100.104
 ST1000DM010-2EP102_ZN1GZ3NK
 e-blue
 postgres
