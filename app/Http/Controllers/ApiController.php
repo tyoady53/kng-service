@@ -38,6 +38,7 @@ class ApiController extends Controller
         $message = 'No data to upload';
 
         while (true) {
+            // Get the next batch of up to 10 rows
             $newData = DB::connection('pgsql_eblue')
                 ->select('SELECT * FROM datapengujian WHERE idx > ? ORDER BY idx ASC LIMIT 10', [$last_uploaded_id]);
 
@@ -45,6 +46,7 @@ class ApiController extends Controller
                 break;
             }
 
+            // Upload current batch
             $uploadResponse = $this->upload($newData);
             $responseData = $uploadResponse->getOriginalContent();
 
@@ -52,6 +54,7 @@ class ApiController extends Controller
                 $this->create_log("Upload failed [".$responseData."]");
             }
 
+            // Update last uploaded ID based on latest data sent
             $last_uploaded_id = end($newData)->id;
             $message = 'All new data uploaded successfully';
             $this->create_log($message);
