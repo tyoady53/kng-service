@@ -40,7 +40,7 @@ class ApiController extends Controller
         while (true) {
             // Get the next batch of up to 10 rows
             $newData = DB::connection('pgsql_eblue')
-                ->select('SELECT * FROM datapengujian WHERE id > ? ORDER BY id ASC LIMIT 10', [$last_uploaded_id]);
+                ->select('SELECT * FROM datapengujian WHERE idx > ? ORDER BY idx ASC LIMIT 10', [$last_uploaded_id]);
 
             if (empty($newData)) {
                 break;
