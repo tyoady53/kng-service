@@ -90,16 +90,16 @@ class ApiController extends Controller
         $hdd_id = $this->helper->getHDD_id();
         $token = $this->helper->encrypt(trim($hdd_id));
         $cloud = $this->lines[5];
-        $table = 'kendaraan';
-
+        
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
-
+        
         foreach($dataList as $list) {
+            $table = 'kendaraan';
             $imgF = 'noImage.png';
             $imgB = 'noImage.png';
             $imgL = 'noImage.png';
             $imgR = 'noImage.png';
-            $base = 'C:\laragon\www\pkbkuningan\assets\images\kendaraan/';
+            $base = $this->lines[6];
             if($list->kodewilayah != $list->kodewilayahasal) {
                 $table = 'kendaraannp';
             }
@@ -107,17 +107,18 @@ class ApiController extends Controller
             ->select("SELECT * FROM $table WHERE NoUji = '".$list->nouji."'");
 
             foreach($pkbKngLocal as $local) {
+                // dd($local->imgF);
                 if($local) {
-                    if (!empty($local->imgF) && file_exists($base . $local->imgF)) {
+                    if ($local->imgF) {
                         $imgF = $local->imgF;
                     }
-                    if (!empty($local->imgB) && file_exists($base . $local->imgB)) {
+                    if ($local->imgB) {
                         $imgB = $local->imgB;
                     }
-                    if (!empty($local->imgL) && file_exists($base . $local->imgL)) {
+                    if ($local->imgL) {
                         $imgL = $local->imgL;
                     }
-                    if (!empty($local->imgR) && file_exists($base . $local->imgR)) {
+                    if ($local->imgR) {
                         $imgR = $local->imgR;
                     }
                 }
@@ -130,7 +131,7 @@ class ApiController extends Controller
             ];
         }
 
-        // dd($dataList,$filePaths);
+        dd($dataList,$filePaths);
 
         try {
             $api_response = $client->post($base_url, [
