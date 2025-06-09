@@ -30,7 +30,6 @@ Route::prefix('public')->group(function () {
 Route::prefix('local')->group(function () {
     Route::get('/info', ApiController::class);
     Route::get('/decrypt', [ApiController::class, 'decrypt']);
-    // Route::get('/get_data', [ApiController::class, 'get_data']);
     Route::get('/send', [ApiController::class, 'send']);
 });
 
