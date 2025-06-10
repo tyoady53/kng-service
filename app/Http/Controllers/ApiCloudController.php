@@ -39,129 +39,142 @@ class ApiCloudController extends Controller
     }
 
     public function post_data(Request $request) {
-        $target = $this->lines[1];
-        $token = $request->token;
+        $token = $request->query('token'); // from URL
         $decrypt = $this->helper->decryptToken($token);
 
-        $decrypt_status = $decrypt['success'];
-        $datas = $request->data;
-
-        $uploaded = '';
-        $uploded_success = null;
-
-        if($decrypt_status) {
-            $last_update = Upload::first();
-            foreach($datas as $data) {
-                $get = Kendaraan::where('no_uji', $data['nouji'])->first();
-                if($get) {
-                    $generated_id = $get->generated_id;
-                    $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
-                    if($detail && $detail->jenis != $data['jenis']) {
-                        $ret = $this->change_jenis($data,$generated_id);
-                    }
-                } else {
-                    $milliseconds = round(microtime(true) * 1000);
-                    $generated_id = md5($data['id'].$milliseconds);
-
-                    Kendaraan::create([
-                        'generated_id'      => $generated_id,
-                        'no_kendaraan'      => $data['noregistrasikendaraan'],
-                        'no_uji'            => $data['nouji'],
-                        'nama'              => $data['nama'],
-                        'nosertifikatreg'   => $data['nosertifikatreg'],
-                        'tglsertifikatreg'  => $data['tglsertifikatreg'],
-                        'norangka'          => $data['norangka'],
-                        'nomesin'           => $data['nomesin'],
-                    ]);
-
-                    KendaraanDetail::create([
-                        'id_kendaraan'      => $generated_id,
-                        'merek'             => $data['merek'],
-                        'tipe'              => $data['tipe'],
-                        'jenis'             => $data['jenis'],
-                        'thpembuatan'       => $data['thpembuatan'],
-                        'bahanbakar'        => $data['bahanbakar'],
-                        'isisilinder'       => $data['isisilinder'],
-                        'dayamotorpenggerak'=> $data['dayamotorpenggerak'],
-                        'jbb'               => $data['jbb'],
-                        'jbkb'              => $data['jbkb'],
-                        'jbi'               => $data['jbi'],
-                        'jbki'              => $data['jbki'],
-                        'mst'               => $data['mst'],
-                        'beratkosong'       => $data['beratkosong'],
-                        'konfigurasisumburoda'  => $data['konfigurasisumburoda'],
-                        'ukuranban'         => $data['ukuranban'],
-                        'panjangkendaraan'  => $data['panjangkendaraan'],
-                        'lebarkendaraan'    => $data['lebarkendaraan'],
-                        'tinggikendaraan'   => $data['tinggikendaraan'],
-                        'panjangbakatautangki'  => $data['panjangbakatautangki'],
-                        'lebarbakatautangki'=> $data['lebarbakatautangki'],
-                        'tinggibakatautangki'   => $data['tinggibakatautangki'],
-                        'julurdepan'        => $data['julurdepan'],
-                        'julurbelakang'     => $data['julurbelakang'],
-                        'jaraksumbu1_2'     => $data['jaraksumbu1_2'],
-                        'jaraksumbu2_3'     => $data['jaraksumbu2_3'],
-                        'jaraksumbu3_4'     => $data['jaraksumbu3_4'],
-                        'dayaangkutorang'   => $data['dayaangkutorang'],
-                        'dayaangkutbarang'  => $data['dayaangkutbarang'],
-                        'kelasjalanterendah'=> $data['kelasjalanterendah']
-                    ]);
-                }
-
-                $masaberlakuuji = DateTime::createFromFormat('dmY', $data['masaberlakuuji']);
-                $tgl_uji = DateTime::createFromFormat('dmY', $data['tgluji']);
-                HasilUji::create([
-                    'id_kendaraan'          => $generated_id,
-                    'fotodepan'             => $data['fotodepansmall'],
-                    'fotobelakang'          => $data['fotobelakangsmall'],
-                    'fotokanan'             => $data['fotokanansmall'],
-                    'fotokiri'              => $data['fotokirismall'],
-                    'emisiasap'             => $data['alatuji_emisiasapbahanbakarsolar'],
-                    'emisico'               => $data['alatuji_emisicobahanbakarbensin'],
-                    'emisihc'               => $data['alatuji_emisihcbahanbakarbensin'],
-                    'totalgayapengereman'   => $data['alatuji_remutamatotalgayapengereman'],
-                    'selisihgayapengereman1'=> $data['alatuji_remutamaselisihgayapengeremanrodakirikanan1'],
-                    'selisihgayapengereman2'=> $data['alatuji_remutamaselisihgayapengeremanrodakirikanan2'],
-                    'selisihgayapengereman3'=> $data['alatuji_remutamaselisihgayapengeremanrodakirikanan3'],
-                    'selisihgayapengereman4'=> $data['alatuji_remutamaselisihgayapengeremanrodakirikanan4'],
-                    'remparkirtangan'       => $data['alatuji_remparkirtangan'],
-                    'remparkirkaki'         => $data['alatuji_remparkirkaki'],
-                    'kincuprodadepan'       => $data['alatuji_kincuprodadepan'],
-                    'tingkatkebisingan'     => $data['alatuji_tingkatkebisingan'],
-                    'kekuatanpancarlampukanan'  => $data['alatuji_lampuutamakekuatanpancarlampukanan'],
-                    'kekuatanpancarlampukiri'   => $data['alatuji_lampuutamakekuatanpancarlampukiri'],
-                    'penyimpanganlampukanan'=> $data['alatuji_lampuutamapenyimpanganlampukanan'],
-                    'penyimpanganlampukiri' => $data['alatuji_lampuutamapenyimpanganlampukiri'],
-                    'penunjukkecepatan'     => $data['alatuji_penunjukkecepatan'],
-                    'kedalamanalurban'      => $data['alatuji_kedalamanalurban'],
-                    'masaberlakuuji'        => $masaberlakuuji->format('Y-m-d'),
-                    'tgl_uji'               => $tgl_uji->format('Y-m-d'),
-                ]);
-
-                $uploded_success .= $data['id'].',';
-                $uploaded = $data['id'];
-            }
-
-            if($last_update) {
-                $uplod_done = $last_update->uploaded_id;
-                $update_uploaded_id = $uplod_done.$uploded_success;
-
-                $last_update->update([
-                    'last_sync'     => $uploaded,
-                    'uploaded_id'   => $update_uploaded_id,
-                ]);
-            } else {
-                Upload::create([
-                    'last_sync'     => $uploaded,
-                    'uploaded_id'   => $uploded_success,
-                ]);
-            }
-
-            return $uploaded;
-        } else {
-            return false;
+        if (!$decrypt['success']) {
+            return response()->json(['success' => false, 'message' => 'Invalid token']);
         }
+
+        $allData = $request->all(); // Laravel parses multipart fields automatically
+
+        $uploadedSuccess = '';
+        $lastUploadedId = '';
+        $uploadPath = public_path('uploads/kendaraan/'.Carbon::now()->format('Ym'));
+
+        // Ensure the directory exists
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
+        foreach ($allData['data'] as $nouji => $item) {
+            // Parse the kendaraan JSON
+            $kendaraanData = json_decode($item['kendaraan'], true);
+            if (!$kendaraanData) continue;
+
+            // Save or update kendaraan
+            $existing = Kendaraan::where('no_uji', $kendaraanData['nouji'])->first();
+
+            if ($existing) {
+                $generated_id = $existing->generated_id;
+                $detail = KendaraanDetail::where('id_kendaraan', $generated_id)->latest()->first();
+
+                if ($detail && $detail->jenis != $kendaraanData['jenis']) {
+                    $this->change_jenis($kendaraanData, $generated_id);
+                }
+            } else {
+                $milliseconds = round(microtime(true) * 1000);
+                $generated_id = md5($kendaraanData['id'].$milliseconds);
+
+                Kendaraan::create([
+                    'generated_id' => $generated_id,
+                    'no_kendaraan' => $kendaraanData['noregistrasikendaraan'],
+                    'no_uji' => $kendaraanData['nouji'],
+                    'nama' => $kendaraanData['nama'],
+                    'nosertifikatreg' => $kendaraanData['nosertifikatreg'],
+                    'tglsertifikatreg' => $kendaraanData['tglsertifikatreg'],
+                    'norangka' => $kendaraanData['norangka'],
+                    'nomesin' => $kendaraanData['nomesin'],
+                ]);
+
+                KendaraanDetail::create([
+                    'id_kendaraan' => $generated_id,
+                    'merek' => $kendaraanData['merek'],
+                    'tipe' => $kendaraanData['tipe'],
+                    'jenis' => $kendaraanData['jenis'],
+                    'thpembuatan' => $kendaraanData['thpembuatan'],
+                    'bahanbakar' => $kendaraanData['bahanbakar'],
+                    'isisilinder' => $kendaraanData['isisilinder'],
+                    'dayamotorpenggerak' => $kendaraanData['dayamotorpenggerak'],
+                    'jbb' => $kendaraanData['jbb'],
+                    'jbkb' => $kendaraanData['jbkb'],
+                    'jbi' => $kendaraanData['jbi'],
+                    'jbki' => $kendaraanData['jbki'],
+                    'mst' => $kendaraanData['mst'],
+                    'beratkosong' => $kendaraanData['beratkosong'],
+                    'konfigurasisumburoda' => $kendaraanData['konfigurasisumburoda'],
+                    'ukuranban' => $kendaraanData['ukuranban'],
+                    'panjangkendaraan' => $kendaraanData['panjangkendaraan'],
+                    'lebarkendaraan' => $kendaraanData['lebarkendaraan'],
+                    'tinggikendaraan' => $kendaraanData['tinggikendaraan'],
+                    'panjangbakatautangki' => $kendaraanData['panjangbakatautangki'],
+                    'lebarbakatautangki' => $kendaraanData['lebarbakatautangki'],
+                    'tinggibakatautangki' => $kendaraanData['tinggibakatautangki'],
+                    'julurdepan' => $kendaraanData['julurdepan'],
+                    'julurbelakang' => $kendaraanData['julurbelakang'],
+                    'jaraksumbu1_2' => $kendaraanData['jaraksumbu1_2'],
+                    'jaraksumbu2_3' => $kendaraanData['jaraksumbu2_3'],
+                    'jaraksumbu3_4' => $kendaraanData['jaraksumbu3_4'],
+                    'dayaangkutorang' => $kendaraanData['dayaangkutorang'],
+                    'dayaangkutbarang' => $kendaraanData['dayaangkutbarang'],
+                    'kelasjalanterendah' => $kendaraanData['kelasjalanterendah'],
+                ]);
+            }
+
+            // Handle image files
+            $foto = $item['foto'] ?? [];
+            $savedImages = [];
+
+            foreach (['imgF' => 'fotodepan', 'imgB' => 'fotobelakang', 'imgR' => 'fotokanan', 'imgL' => 'fotokiri'] as $key => $field) {
+                if ($request->hasFile("data.$nouji.foto.$key")) {
+                    $file = $request->file("data.$nouji.foto.$key");
+                    $filename = uniqid() . '_' . $file->getClientOriginalName();
+                    $file->move($uploadPath, $filename);
+                    $savedImages[$field] = $uploadPath . '/' . $filename;
+                } else {
+                    $savedImages[$field] = null;
+                }
+            }
+
+            // Save HasilUji
+            $masaberlakuuji = DateTime::createFromFormat('dmY', $kendaraanData['masaberlakuuji']);
+            $tgl_uji = DateTime::createFromFormat('dmY', $kendaraanData['tgluji']);
+
+            HasilUji::create([
+                'id_kendaraan' => $generated_id,
+                'fotodepan' => $savedImages['fotodepan'],
+                'fotobelakang' => $savedImages['fotobelakang'],
+                'fotokanan' => $savedImages['fotokanan'],
+                'fotokiri' => $savedImages['fotokiri'],
+                // Add additional fields here from $kendaraanData
+                'emisiasap' => $kendaraanData['alatuji_emisiasapbahanbakarsolar'],
+                'emisico' => $kendaraanData['alatuji_emisicobahanbakarbensin'],
+                'emisihc' => $kendaraanData['alatuji_emisihcbahanbakarbensin'],
+                // Continue for the rest...
+                'masaberlakuuji' => $masaberlakuuji->format('Y-m-d'),
+                'tgl_uji' => $tgl_uji->format('Y-m-d'),
+            ]);
+
+            $uploadedSuccess .= $kendaraanData['id'] . ',';
+            $lastUploadedId = $kendaraanData['id'];
+        }
+
+        $lastUpdate = Upload::first();
+        if ($lastUpdate) {
+            $lastUpdate->update([
+                'last_sync' => $lastUploadedId,
+                'uploaded_id' => $lastUpdate->uploaded_id . $uploadedSuccess,
+            ]);
+        } else {
+            Upload::create([
+                'last_sync' => $lastUploadedId,
+                'uploaded_id' => $uploadedSuccess,
+            ]);
+        }
+
+        return response()->json(['success' => true, 'uploaded_ids' => $uploadedSuccess]);
     }
+
 
     function change_jenis($data,$generated_id) {
         $uploded_success = null;

@@ -82,71 +82,159 @@ class ApiController extends Controller
         return $response;
     }
 
+    // function upload($dataList) {
+    //     $client = new Client();
+
+    //     $filePaths = null;
+
+    //     $hdd_id = $this->helper->getHDD_id();
+    //     $token = $this->helper->encrypt(trim($hdd_id));
+    //     $cloud = $this->lines[5];
+        
+    //     $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
+        
+    //     foreach($dataList as $list) {
+    //         $table = 'kendaraan';
+    //         $imgF = 'noImage.png';
+    //         $imgB = 'noImage.png';
+    //         $imgL = 'noImage.png';
+    //         $imgR = 'noImage.png';
+    //         $base = $this->lines[6];
+    //         if($list->kodewilayah != $list->kodewilayahasal) {
+    //             $table = 'kendaraannp';
+    //         }
+    //         $pkbKngLocal = DB::connection('mysql_local')
+    //         ->select("SELECT * FROM $table WHERE NoUji = '".$list->nouji."'");
+
+    //         foreach($pkbKngLocal as $local) {
+    //             if($local) {
+    //                 if ($local->imgF) {
+    //                     $imgF = $local->imgF;
+    //                 }
+    //                 if ($local->imgB) {
+    //                     $imgB = $local->imgB;
+    //                 }
+    //                 if ($local->imgL) {
+    //                     $imgL = $local->imgL;
+    //                 }
+    //                 if ($local->imgR) {
+    //                     $imgR = $local->imgR;
+    //                 }
+    //             }
+    //         }
+    //         $filePaths[$list->nouji] = [
+    //             $base.$imgF,
+    //             $base.$imgB,
+    //             $base.$imgL,
+    //             $base.$imgR,
+    //         ];
+    //     }
+
+    //     dd($dataList,$filePaths);
+
+    //     try {
+    //         $api_response = $client->post($base_url, [
+    //             'json' => [
+    //                 'data' => $dataList,
+    //             ],
+    //         ]);
+
+    //         $response = json_decode($api_response->getBody(), true);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $response,
+    //         ]);
+    //     } catch (\GuzzleHttp\Exception\RequestException $e) {
+    //         $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to contact remote API',
+    //             'error' => $e->getMessage(),
+    //             'response' => $body,
+    //         ]);
+    //     }
+    // }
+
     function upload($dataList) {
         $client = new Client();
-
-        $filePaths = null;
-
         $hdd_id = $this->helper->getHDD_id();
         $token = $this->helper->encrypt(trim($hdd_id));
         $cloud = $this->lines[5];
-        
         $base_url = $cloud . '/api/cloud/post_data?token=' . $token;
-        
-        foreach($dataList as $list) {
-            $table = 'kendaraan';
-            $imgF = 'noImage.png';
-            $imgB = 'noImage.png';
-            $imgL = 'noImage.png';
-            $imgR = 'noImage.png';
-            $base = $this->lines[6];
-            if($list->kodewilayah != $list->kodewilayahasal) {
-                $table = 'kendaraannp';
-            }
-            $pkbKngLocal = DB::connection('mysql_local')
-            ->select("SELECT * FROM $table WHERE NoUji = '".$list->nouji."'");
+        $base = $this->lines[6];
 
-            foreach($pkbKngLocal as $local) {
-                if($local) {
-                    if ($local->imgF) {
-                        $imgF = $local->imgF;
-                    }
-                    if ($local->imgB) {
-                        $imgB = $local->imgB;
-                    }
-                    if ($local->imgL) {
-                        $imgL = $local->imgL;
-                    }
-                    if ($local->imgR) {
-                        $imgR = $local->imgR;
-                    }
+        $data = [];
+        $multipart = [];
+
+        foreach ($dataList as $list) {
+            $nouji = $list->nouji;
+            $table = ($list->kodewilayah != $list->kodewilayahasal) ? 'kendaraannp' : 'kendaraan';
+
+            $imgDefaults = [
+                'imgF' => 'logo-big.png',
+                'imgB' => 'logo-big.png',
+                'imgL' => 'logo-big.png',
+                'imgR' => 'logo-big.png',
+            ];
+
+            $local = DB::connection('mysql_local')
+                ->table($table)
+                ->where('NoUji', $nouji)
+                ->first();
+
+            $imgUrls = [];
+            foreach (['imgF', 'imgB', 'imgL', 'imgR'] as $key) {
+                $filename = $local && $local->$key ? "kendaraan/" . $local->$key : $imgDefaults[$key];
+                $imgUrls[$key] = [
+                    'url' => $base . $filename,
+                    'filename' => basename($filename),
+                ];
+            }
+
+            $data[$nouji] = [
+                'kendaraan' => json_decode(json_encode($list), true),
+                'foto' => [],
+            ];
+
+            $multipart[] = [
+                'name' => "data[{$nouji}][kendaraan]",
+                'contents' => json_encode($data[$nouji]['kendaraan']),
+            ];
+
+            foreach ($imgUrls as $key => $img) {
+                try {
+                    $tmpFile = tempnam(sys_get_temp_dir(), $key);
+                    file_put_contents($tmpFile, file_get_contents($img['url']));
+
+                    $multipart[] = [
+                        'name' => "data[{$nouji}][foto][{$key}]",
+                        'contents' => fopen($tmpFile, 'r'),
+                        'filename' => $img['filename'],
+                    ];
+
+                    $data[$nouji]['foto'][$key] = $img['url'];
+                } catch (\Exception $e) {
+                    $data[$nouji]['foto'][$key] = 'FAILED_DOWNLOAD';
                 }
             }
-            $filePaths[$list->nouji] = [
-                $base.$imgF,
-                $base.$imgB,
-                $base.$imgL,
-                $base.$imgR,
-            ];
         }
 
-        dd($dataList,$filePaths);
+        // dd($multipart); // Optional debugging
 
         try {
-            $api_response = $client->post($base_url, [
-                'json' => [
-                    'data' => $dataList,
-                ],
+            $response = $client->post($base_url, [
+                'multipart' => $multipart,
             ]);
-
-            $response = json_decode($api_response->getBody(), true);
 
             return response()->json([
                 'success' => true,
-                'data' => $response,
+                'sent_data' => $data,
+                'response' => json_decode($response->getBody(), true),
             ]);
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             $body = $e->hasResponse() ? $e->getResponse()->getBody()->getContents() : null;
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to contact remote API',
