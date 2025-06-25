@@ -121,31 +121,16 @@ class ApiCloudController extends Controller
                 ]);
             }
 
-            // Handle image files
-            $foto = $item['foto'] ?? [];
-            $savedImages = [];
-
-            foreach (['imgF' => 'fotodepan', 'imgB' => 'fotobelakang', 'imgR' => 'fotokanan', 'imgL' => 'fotokiri'] as $key => $field) {
-                if ($request->hasFile("data.$nouji.foto.$key")) {
-                    $file = $request->file("data.$nouji.foto.$key");
-                    $filename = uniqid() . '_' . $file->getClientOriginalName();
-                    $file->move($uploadPath, $filename);
-                    $savedImages[$field] = $uploadPath . '/' . $filename;
-                } else {
-                    $savedImages[$field] = null;
-                }
-            }
-
             // Save HasilUji
             $masaberlakuuji = DateTime::createFromFormat('dmY', $kendaraanData['masaberlakuuji']);
             $tgl_uji = DateTime::createFromFormat('dmY', $kendaraanData['tgluji']);
 
             HasilUji::create([
                 'id_kendaraan' => $generated_id,
-                'fotodepan' => $savedImages['fotodepan'],
-                'fotobelakang' => $savedImages['fotobelakang'],
-                'fotokanan' => $savedImages['fotokanan'],
-                'fotokiri' => $savedImages['fotokiri'],
+                'fotodepan' => $kendaraanData['fotodepan'],
+                'fotobelakang' => $kendaraanData['fotobelakang'],
+                'fotokanan' => $kendaraanData['fotokanan'],
+                'fotokiri' => $kendaraanData['fotokiri'],
                 // Add additional fields here from $kendaraanData
                 'emisiasap' => $kendaraanData['alatuji_emisiasapbahanbakarsolar'],
                 'emisico' => $kendaraanData['alatuji_emisicobahanbakarbensin'],
