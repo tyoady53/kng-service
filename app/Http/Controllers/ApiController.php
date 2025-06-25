@@ -154,14 +154,19 @@ class ApiController extends Controller
         // Optional debug:
         // dd($dataList,$imageUrl);
 
+        // dd($dataList); // View the successful response
         try {
             $api_response = $client->post($base_url, [
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
                 'json' => [
                     'data' => $dataList,
                 ],
+                // 'debug' => true, // 👈 adds curl-style verbose output to STDERR
             ]);
 
-            $response = json_decode($api_response->getBody(), true);
+            $response = json_decode($api_response->getBody()->getContents(), true);
 
             return response()->json([
                 'success' => true,
