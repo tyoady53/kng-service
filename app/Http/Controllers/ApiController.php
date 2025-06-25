@@ -148,7 +148,6 @@ class ApiController extends Controller
                         $list->fotokanansmall = $base64Image;
                         break;
                 }
-                // dd($imageData,$base64Image);
             }
         }
         
