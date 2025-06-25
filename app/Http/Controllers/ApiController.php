@@ -50,16 +50,16 @@ class ApiController extends Controller
             $uploadResponse = $this->upload($newData);
             $responseData = $uploadResponse->getOriginalContent();
 
-            dd($responseData);
+            // dd($responseData);
 
-            if (!($responseData['success'] ?? false)) {
-                $this->create_log("Upload failed [".$responseData."]");
-            }
+            // if (!($responseData['success'] ?? false)) {
+            //     $this->create_log("Upload failed [".$responseData."]");
+            // }
 
             // Update last uploaded ID based on latest data sent
-            $last_uploaded_id = end($newData)->id;
+            $last_uploaded_id = end($newData)->idx;
             $message = 'All new data uploaded successfully';
-            $this->create_log($message);
+            // $this->create_log($message);
         }
 
         $this->create_log($message);
