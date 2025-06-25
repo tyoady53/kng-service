@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('hasil_ujis', function (Blueprint $table) {
             $table->id();
             $table->string('id_kendaraan',50);
-            $table->string('fotodepan')->nullable();
-            $table->string('fotobelakang')->nullable();
-            $table->string('fotokanan')->nullable();
-            $table->string('fotokiri')->nullable();
+            $table->mediumBlob('fotodepan')->nullable();
+            $table->mediumBlob('fotobelakang')->nullable();
+            $table->mediumBlob('fotokanan')->nullable();
+            $table->mediumBlob('fotokiri')->nullable();
             $table->string('emisiasap')->nullable();
             $table->string('emisico')->nullable();
             $table->string('emisihc')->nullable();
