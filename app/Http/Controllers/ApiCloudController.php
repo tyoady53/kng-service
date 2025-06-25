@@ -39,6 +39,7 @@ class ApiCloudController extends Controller
     }
 
     public function post_data(Request $request) {
+        dd($request);
         $token = $request->query('token');
         $decrypt = $this->helper->decryptToken($token);
 
