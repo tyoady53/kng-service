@@ -50,7 +50,7 @@ class ApiController extends Controller
             $uploadResponse = $this->upload($newData);
             $responseData = $uploadResponse->getOriginalContent();
 
-            // dd($uploadResponse);
+            dd($responseData);
 
             if (!($responseData['success'] ?? false)) {
                 $this->create_log("Upload failed [".$responseData."]");

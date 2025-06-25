@@ -39,6 +39,7 @@ class ApiCloudController extends Controller
     }
 
     public function post_data(Request $request) {
+        dd($request);
         $token = $request->query('token'); // from URL
         $decrypt = $this->helper->decryptToken($token);
 
@@ -50,12 +51,6 @@ class ApiCloudController extends Controller
 
         $uploadedSuccess = '';
         $lastUploadedId = '';
-        $uploadPath = public_path('uploads/kendaraan/'.Carbon::now()->format('Ym'));
-
-        // Ensure the directory exists
-        if (!file_exists($uploadPath)) {
-            mkdir($uploadPath, 0755, true);
-        }
 
         foreach ($allData['data'] as $nouji => $item) {
             // Parse the kendaraan JSON
