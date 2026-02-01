@@ -33,7 +33,8 @@ class ApiController extends Controller
 
     public function send()
     {
-        $last_upload = $this->get_last_uploaded();
+        // $last_upload = $this->get_last_uploaded();
+        $last_upload = 0;
         $last_uploaded_id = $last_upload['data'] ?? 0;
         $message = 'No data to upload';
 
@@ -41,16 +42,17 @@ class ApiController extends Controller
             // Get the next batch of up to 10 rows
             $newData = DB::connection('pgsql_eblue')
                 ->select('SELECT * FROM datapengujian WHERE idx > ? ORDER BY idx ASC LIMIT 10', [$last_uploaded_id]);
+            // coba di join dengan table foto
 
             if (empty($newData)) {
                 break;
             }
 
+            dd($newData);
             // Upload current batch
             $uploadResponse = $this->upload($newData);
             $responseData = $uploadResponse->getOriginalContent();
 
-            // dd($responseData);
 
             // if (!($responseData['success'] ?? false)) {
             //     $this->create_log("Upload failed [".$responseData."]");
